@@ -4,7 +4,7 @@ import hotelRepository from "@/repositories/hotels-repository";
 async function getAllHotels() {
   const hotels = await hotelRepository.findHotels();
 
-  if (!hotels) {
+  if (hotels.length === 0) {
     throw notFoundError();
   }
 
@@ -27,9 +27,8 @@ async function getHotelRooms(hotelId: number) {
     image: hotel.image,
     createdAt: hotel.createdAt.toISOString(),
     updatedAt: hotel.updatedAt.toISOString(),
-    Rooms: [
-      rooms
-    ]
+    Rooms: rooms
+    
   };
 
   return body;

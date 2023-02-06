@@ -9,22 +9,33 @@ export async function getAllHotels(req: AuthenticatedRequest, res: Response) {
 
     return res.status(httpStatus.OK).send(hotels);
   } catch (err) {
+    if(err.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+
     return res.sendStatus(httpStatus.NO_CONTENT);
   }
 }
 
 export async function getHotelRooms(req: AuthenticatedRequest, res: Response) {
-  const hotelId = parseInt(req.params.hotelId);
+  try {
+    const hotelId = parseInt(req.params.hotelId);
 
-  if(isNaN(hotelId)) {
-    return res.sendStatus(httpStatus.BAD_REQUEST);
+    if(isNaN(hotelId)) {
+      return res.sendStatus(httpStatus.BAD_REQUEST);
+    }
+
+    const rooms = await hotelService.getHotelRooms(hotelId);
+
+    if(!rooms) {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+
+    res.status(httpStatus.OK).send(rooms);
+  } catch (err) {
+    if (err.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+    return res.sendStatus(httpStatus.NO_CONTENT);
   }
-
-  const rooms = await hotelService.getHotelRooms(hotelId);
-
-  if(!rooms) {
-    return res.sendStatus(httpStatus.NOT_FOUND);
-  }
-
-  res.status(httpStatus.OK).send(rooms);
 }
